@@ -11,6 +11,9 @@ import { fromUint8Array } from "js-base64";
 
 import { type Message } from "@/types/type";
 
+import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
+import { Readable } from "stream";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -22,7 +25,7 @@ const systemPrompt = endent`
   Code (no \`\`\`):
   `;
 
-export const OpenAIStream = async (
+export const PreOpenAIStream = async (
   messages: Message[],
   model: string,
   key: string
@@ -86,6 +89,36 @@ export const OpenAIStream = async (
   });
 
   return stream;
+};
+
+export const OpenAIStream = async (
+  messages: Message[],
+  model: string,
+  key: string
+) => {
+  const system = { role: "system", content: systemPrompt };
+
+  const client = new OpenAIClient(
+    "https://wingpt4.openai.azure.com/", 
+    new AzureKeyCredential(key)
+  );
+  const { id, created, choices, usage } = await client.getChatCompletions("wipgpt4", [system, ...messages]);
+  if (choices[0] && choices[0].message) {
+    console.log(choices[0].message.content);
+    const code = choices[0].message.content;
+    // rest of your code
+    // const stream = new Readable({
+    //   read() {
+    //     this.push(serializeCode(code!));
+    //     this.push(null);
+    //   }
+    // });
+  
+    // return stream;
+    return code;
+  } else {
+    throw new Error("No code returned");
+  }
 };
 
 export const parseCodeFromMessage = (message: string) => {

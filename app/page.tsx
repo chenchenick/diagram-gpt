@@ -70,25 +70,15 @@ export default function Home() {
       return;
     }
 
-    const data = response.body;
+    const data = await response.text();
 
     if (!data) {
       alert("Something went wrong.");
       return;
     }
 
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    let code = "";
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      code += chunkValue;
-      setDraftOutputCode((prevCode) => prevCode + chunkValue);
-    }
-    setOutputCode(parseCodeFromMessage(code));
+    setDraftOutputCode(data);
+    setOutputCode(parseCodeFromMessage(data));
   };
 
   return (
