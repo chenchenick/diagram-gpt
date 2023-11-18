@@ -4,6 +4,7 @@ switched to Azure OpenAI API because OpenAI won't take my CC -_-
 Draw flowchart, sequence diagram, class diagram, user journey, gantt, C4C diagram with nature language.
 
 ![scerenshot](./app/opengraph-image.png)
+![scerenshot](./app/azure.png)
 
 ## Getting Started
 
