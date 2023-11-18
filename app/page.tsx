@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 
-import { apiKeyAtom, modelAtom } from "@/lib/atom";
+import { apiKeyAtom, modelAtom, endpointAtom, deploymentNameAtom } from "@/lib/atom";
 import { Mermaid } from "@/components/Mermaids";
 import { ChatInput } from "@/components/ChatInput";
 import { CodeBlock } from "@/components/CodeBlock";
@@ -15,6 +15,8 @@ import type { OpenAIModel } from "@/types/type";
 export default function Home() {
   const [apiKey, setApiKey] = useAtom(apiKeyAtom);
   const [model, setModel] = useAtom(modelAtom);
+  const [endpoint, setEndpoint] = useAtom(endpointAtom);
+  const [deploymentName, setDeploymentName] = useAtom(deploymentNameAtom);
   const [draftMessage, setDraftMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [draftOutputCode, setDraftOutputCode] = useState<string>("");
@@ -23,12 +25,20 @@ export default function Home() {
   useEffect(() => {
     const apiKey = localStorage.getItem("apiKey");
     const model = localStorage.getItem("model");
+    const endpoint = localStorage.getItem("endpoint");
+    const deploymentName = localStorage.getItem("deploymentName");
 
     if (apiKey) {
       setApiKey(apiKey);
     }
     if (model) {
       setModel(model as OpenAIModel);
+    }
+    if (endpoint) {
+      setEndpoint(endpoint);
+    }
+    if (deploymentName) {
+      setDeploymentName(deploymentName);
     }
   }, []);
 
@@ -54,7 +64,7 @@ export default function Home() {
     setDraftOutputCode("");
 
     const controller = new AbortController();
-    const body: RequestBody = { messages: newMessages, model, apiKey };
+    const body: RequestBody = { messages: newMessages, model, apiKey, endpoint, deploymentName };
 
     const response = await fetch("/api/chat", {
       method: "POST",
@@ -77,8 +87,9 @@ export default function Home() {
       return;
     }
 
-    setDraftOutputCode(data);
-    setOutputCode(parseCodeFromMessage(data));
+    const code = parseCodeFromMessage(data);
+    setDraftOutputCode(code);
+    setOutputCode(code);
   };
 
   return (

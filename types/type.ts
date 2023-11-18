@@ -9,6 +9,8 @@ export interface RequestBody {
   messages: Message[];
   model: OpenAIModel;
   apiKey: string;
+  endpoint: string;
+  deploymentName: string;
 }
 
 export type Theme = "default" | "neutral" | "dark" | "forest" | "base";
